@@ -1,0 +1,407 @@
+一份不错的php面试题,附答案,有准备换工作的同学可以参考一下.
+一、基础题
+1. 写出如下程序的输出结果
+
+<?php
+    $str1 = null;
+    $str2 = false;
+    echo $str1==$str2 ? '相等' : '不相等';
+    $str3 = '';
+    $str4 = 0;
+    echo $str3==$str4 ? '相等' : '不相等';
+    $str5 = 0;
+    $str6 = '0';
+    echo $str5===$str6 ? '相等' : '不相等';
+?>
+相等   相等   不相等
+*************************************************************
+相等   相等   不相等
+
+
+is_null与isset相反  empty与if相反
+使用 PHP 函数对变量 $x 进行比较
+表达式	gettype()	empty()	is_null()	isset()	boolean : if($x)
+$x = "";	string	TRUE	FALSE	TRUE	FALSE
+$x = null;	NULL	TRUE	TRUE	FALSE	FALSE
+var $x;	NULL	TRUE	TRUE	FALSE	FALSE
+$x is undefined	NULL	TRUE	TRUE	FALSE	FALSE
+$x = array();	array	TRUE	FALSE	TRUE	FALSE
+$x = false;	boolean	TRUE	FALSE	TRUE	FALSE
+$x = true;	boolean	FALSE	FALSE	TRUE	TRUE
+$x = 1;	integer	FALSE	FALSE	TRUE	TRUE
+$x = 42;	integer	FALSE	FALSE	TRUE	TRUE
+$x = 0;	integer	TRUE	FALSE	TRUE	FALSE
+$x = -1;	integer	FALSE	FALSE	TRUE	TRUE
+$x = "1";	string	FALSE	FALSE	TRUE	TRUE
+$x = "0";	string	TRUE	FALSE	TRUE	FALSE
+$x = "-1";	string	FALSE	FALSE	TRUE	TRUE
+$x = "php";	string	FALSE	FALSE	TRUE	TRUE
+$x = "true";	string	FALSE	FALSE	TRUE	TRUE
+$x = "false";	string	FALSE	FALSE	TRUE	TRUE
+
+
+2. 写出如下程序的输出结果
+
+<?php
+    $a1 = null;
+    $a2 = false;
+    $a3 = 0;
+    $a4 = '';
+    $a5 = '0';
+    $a6 = 'null';
+    $a7 = array();
+    $a8 = array(array());
+    echo empty($a1) ? 'true' : 'false';
+    echo empty($a2) ? 'true' : 'false';
+    echo empty($a3) ? 'true' : 'false';
+    echo empty($a4) ? 'true' : 'false';
+    echo empty($a5) ? 'true' : 'false';
+    echo empty($a6) ? 'true' : 'false';
+    echo empty($a7) ? 'true' : 'false';
+    echo empty($a8) ? 'true' : 'false';
+?>
+true   true  true   true   false   false   true   false
+**********************************************************
+true   true  true   true   true   false   true   false
+empty()为true    ""  null   undefined   $a    array()   false    0  "0"
+is_null()为true  null   $a   undefined     未定义或null为true
+is_set()为false   null   $a  undefined      没有设置或设置null或false
+
+php类型比较表:http://php.net/manual/zh/types.comparisons.php
+
+
+
+3. 写出如下程序的输出结果
+
+<?php
+    $test = 'aaaaaa';
+    $abc = & $test;
+    unset($test);
+    echo $abc;
+?>
+
+aaaaaa
+**********************************************************
+aaaaaa
+当 unset 一个引用，只是断开了变量名和变量内容之间的绑定。这并不意味着变量内容被销毁了
+
+
+
+4. 写出如下程序的输出结果
+
+<?php
+    $count = 5;
+    function get_count(){
+        static $count = 0;
+        return $count++;
+    }
+    echo $count;
+    ++$count;
+    echo get_count();
+    echo get_count();
+?>
+5 1  2
+**********************************************************
+5 0  2
+
+++$a	前加	$a 的值加一，然后返回 $a。
+$a++	后加	返回 $a，然后将 $a 的值加一。
+--$a	前减	$a 的值减一， 然后返回 $a。
+$a--	后减	返回 $a，然后将 $a 的值减一。
+
+$a=1;
+$b=$a++;
+echo $b;
+结果:1
+
+5. 写出如下程序的输出结果
+
+<?php
+    $GLOBALS['var1'] = 5;
+    $var2 = 1;
+    function get_value(){
+        global $var2;
+        $var1 = 0;
+        return $var2++;
+    }
+    get_value();
+    echo $var1;
+    echo $var2;
+?>
+5 2
+**********************************************************
+5 2
+
+
+6. 写出如下程序的输出结果
+
+<?php
+    function get_arr($arr){
+        unset($arr[0]);
+    }
+    $arr1 = array(1, 2);
+    $arr2 = array(1, 2);
+    get_arr(&$arr1);
+    get_arr($arr2);
+    echo count($arr1);
+    echo count($arr2);
+?>
+报错     2   1
+**********************************************************
+5.5报错  引用需要在函数参数定义
+5.2 结果  1   2
+
+
+
+7. 使用五种以上方式获取一个文件的扩展名
+要求：dir/upload.image.jpg，找出 .jpg 或者 jpg ，
+必须使用PHP自带的处理函数进行处理，方法不能明显重复，可以封装成函数，比如 get_ext1($file_name), get_ext2($file_name)
+get_ext1($file_name){
+	$arr=explode(".",$file_name);
+	return $arr[(count($arr)-1)];
+}
+**********************************************************
+function get_ext1($file_name){
+    return strrchr($file_name, '.');
+}
+function get_ext2($file_name){
+    return substr($file_name, strrpos($file_name, '.'));
+}
+function get_ext3($file_name){
+    return array_pop(explode('.', $file_name));
+}
+function get_ext4($file_name){
+    return pathinfo($file_name, PATHINFO_EXTENSION);
+}
+function get_ext5($file_name){
+    return strrev(substr(strrev($file_name), 0, strpos(strrev($file_name), '.')));
+}
+
+
+
+二、算法题
+1. 使用PHP描述冒泡排序和快速排序算法，对象可以是一个数组
+
+****************************************************************
+$a=array('3','8','1','4','11','7');
+$len = count($a);
+for($i=0;$i<$len;$i++){
+    for($j=$len-1;$j>$i;$j--){
+        if($a[$j]>$a[$j-1]){
+            $tmp=$a[$j];
+            $a[$j]=$a[$j-1];
+            $a[$j-1]=$tmp;
+        }
+    }
+}
+echo "<pre>";
+print_r($a);
+
+3个关键：2个循环1个比较
+比较决定升序还是降序
+内部循环，将最大或最小值放到最顶或最低
+外部循环，多个内部循环，达到冒泡效果
+内外部循环方向需要相反。
+上述代码为从下往上冒泡
+***************************************************************
+选择排序
+$a=array('3','8','1','4','11','7');
+$len = count($a);
+
+for($i=0;$i<$len;$i++){
+    $p=$i;
+    for($j=$len-1;$j>$i;$j--){
+        if($a[$j]>$a[$p]){
+            $p=$j;
+        }
+    }
+    $tmp=$a[$i];
+    $a[$i]=$a[$p];
+    $a[$p]=$tmp;
+}
+echo "<pre>";
+print_r($a);
+思路与冒泡类似，内部循环一次交换一次数据
+***************************************************************
+快速排序
+function quick_sort($arr) {
+    //先判断是否需要继续进行
+    $length = count($arr);
+    if($length <= 1) {
+        return $arr;
+    }
+    //如果没有返回，说明数组内的元素个数 多余1个，需要排序
+    //选择一个标尺
+    //选择第一个元素
+    $base_num = $arr[0];
+    //遍历 除了标尺外的所有元素，按照大小关系放入两个数组内
+    //初始化两个数组
+    $left_array = array();//小于标尺的
+    $right_array = array();//大于标尺的
+    for($i=1; $i<$length; $i++) {
+        if($base_num > $arr[$i]) {
+            //放入左边数组
+            $left_array[] = $arr[$i];
+        } else {
+            //放入右边
+            $right_array[] = $arr[$i];
+        }
+    }
+    //再分别对 左边 和 右边的数组进行相同的排序处理方式
+    //递归调用这个函数,并记录结果
+    $left_array = quick_sort($left_array);
+    $right_array = quick_sort($right_array);
+    //合并左边 标尺 右边
+    return array_merge($left_array, array($base_num), $right_array);
+}
+***************************************************************
+插入排序
+function insert_sort($arr) {
+    //区分 哪部分是已经排序好的
+    //哪部分是没有排序的
+    //找到其中一个需要排序的元素
+    //这个元素 就是从第二个元素开始，到最后一个元素都是这个需要排序的元素
+    //利用循环就可以标志出来
+    //i循环控制 每次需要插入的元素，一旦需要插入的元素控制好了，
+    //间接已经将数组分成了2部分，下标小于当前的（左边的），是排序好的序列
+    for($i=1, $len=count($arr); $i<$len; $i++) {
+        //获得当前需要比较的元素值。
+        $tmp = $arr[$i];
+        //内层循环控制 比较 并 插入
+        for($j=$i-1;$j>=0;$j--) {
+            //$arr[$i];//需要插入的元素; $arr[$j];//需要比较的元素
+            if($tmp < $arr[$j]) {
+                //发现插入的元素要小，交换位置
+                //将后边的元素与前面的元素互换
+                $arr[$j+1] = $arr[$j];
+                //将前面的数设置为 当前需要交换的数
+                $arr[$j] = $tmp;
+            } else {
+                //如果碰到不需要移动的元素
+                //由于是已经排序好是数组，则前面的就不需要再次比较了。
+                break;
+            }
+        }
+    }
+    //将这个元素 插入到已经排序好的序列内。
+    //返回
+    return $arr;
+}
+
+
+
+
+
+2. 使用PHP描述顺序查找和二分查找（也叫做折半查找）算法，顺序查找必须考虑效率，对象可以是一个有序数组
+顺序查找
+function sec_sch($arr,$val){
+    foreach($arr as $key=>$tmp){
+        if($val==$tmp){
+            return $key;
+        }
+    }
+}
+**********************************************************
+
+
+
+
+
+3. 写一个二维数组排序算法函数，能够具有通用性，可以调用php内置函数
+
+
+
+
+
+二、算法题
+1. 使用PHP描述冒泡排序和快速排序算法，对象可以是一个数组
+//冒泡排序（数组排序）
+
+function bubble_sort($array){
+    $count = count($array);
+    if ($count <= 0) return false;
+    for($i=0; $i<$count; $i++){
+        for($j=$i; $j<$count-1; $j++){
+            if ($array[$i] > $array[$j]){
+                $tmp = $array[$i];
+                $array[$i] = $array[$j];
+                $array[$j] = $tmp;
+            }
+        }
+    }
+    return $array;
+}
+//快速排序（数组排序）
+
+function quick_sort($array) {
+    if (count($array) <= 1) return $array;
+    $key = $array[0];
+    $left_arr = array();
+    $right_arr = array();
+    for ($i=1; $i<count($array); $i++){
+        if ($array[$i] <= $key)
+            $left_arr[] = $array[$i];
+        else
+            $right_arr[] = $array[$i];
+    }
+    $left_arr = quick_sort($left_arr);
+    $right_arr = quick_sort($right_arr);
+    return array_merge($left_arr, array($key), $right_arr);
+}
+2. 使用PHP描述顺序查找和二分查找（也叫做折半查找）算法，顺序查找必须考虑效率，对象可以是一个有序数组
+//二分查找（数组里查找某个元素）
+
+function bin_sch($array, $low, $high, $k){
+    if ($low <= $high){
+    $mid = intval(($low+$high)/2);
+    if ($array[$mid] == $k){
+    return $mid;
+    }elseif ($k < $array[$mid]){
+    return bin_sch($array, $low, $mid-1, $k);
+    }else{
+    return bin_sch($array, $mid+1, $high, $k);
+    }
+    }
+    return -1;
+}
+//顺序查找（数组里查找某个元素）
+
+function seq_sch($array, $n, $k){
+    $array[$n] = $k;
+    for($i=0; $i<$n; $i++){
+        if($array[$i]==$k){
+            break;
+        }
+    }
+    if ($i<$n){
+        return $i;
+    }else{
+        return -1;
+    }
+}
+3. 写一个二维数组排序算法函数，能够具有通用性，可以调用php内置函数
+//二维数组排序， $arr是数据，$keys是排序的健值，$order是排序规则，1是升序，0是降序
+
+function array_sort($arr, $keys, $order=0) {
+    if (!is_array($arr)) {
+        return false;
+    }
+    $keysvalue = array();
+    foreach($arr as $key => $val) {
+        $keysvalue[$key] = $val[$keys];
+    }
+    if($order == 0){
+        asort($keysvalue);
+    }else {
+        arsort($keysvalue);
+    }
+    reset($keysvalue);
+    foreach($keysvalue as $key => $vals) {
+        $keysort[$key] = $key;
+    }
+    $new_array = array();
+    foreach($keysort as $key => $val) {
+        $new_array[$key] = $arr[$val];
+    }
+    return $new_array;
+}

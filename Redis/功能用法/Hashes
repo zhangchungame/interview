@@ -1,0 +1,142 @@
+1.HSET key field value
+设置 key 指定的哈希集中指定字段的值。
+如果 key 指定的哈希集不存在，会创建一个新的哈希集并与 key 关联。  返回1
+如果字段在哈希集中存在，它将被重写。   返回0
+127.0.0.1:6379> HSET zc fild1 "val1"
+(integer) 1
+127.0.0.1:6379> HSET zc fild1 "val11"
+(integer) 0
+127.0.0.1:6379>
+
+2.HGET key field
+返回 key 指定的哈希集中该字段所关联的值.当字段不存在或者 key 不存在时返回nil。
+127.0.0.1:6379> HGET zc fild1
+"val11"
+127.0.0.1:6379> HGET zc fild2
+(nil)
+127.0.0.1:6379>
+
+3.HEXISTS key field
+返回hash里面key是否存在的标志
+1 哈希集中含有该字段。
+0 哈希集中不含有该存在字段，或者key不存在。
+127.0.0.1:6379> HEXISTS zc fild1
+(integer) 1
+127.0.0.1:6379> HEXISTS zc fild3
+(integer) 0
+
+4.HDEL key field [field ...]
+从 key 指定的哈希集中移除指定的域。在哈希集中不存在的域将被忽略。
+如果 key 指定的哈希集不存在，它将被认为是一个空的哈希集，该命令将返回0。
+返回从哈希集中成功移除的域的数量，不包括指出但不存在的那些域
+127.0.0.1:6379> HDEL zc fild1 fild2 fild3 fild4
+(integer) 1
+
+5.HGETALL key
+返回 key 指定的哈希集中所有的字段和值。返回值中，每个字段名的下一个是它的值，所以返回值的长度是哈希集大小的两倍
+哈希集中字段和值的列表。当 key 指定的哈希集不存在时返回空列表。
+127.0.0.1:6379> hset zc fild1 "val1"
+(integer) 1
+127.0.0.1:6379> hset zc fild2 "val2"
+(integer) 1
+127.0.0.1:6379> HGETALL zc
+1) "fild1"
+2) "val1"
+3) "fild2"
+4) "val2"
+
+
+6.HINCRBY key field increment
+增加 key 指定的哈希集中指定字段的数值。如果 key 不存在，会创建一个新的哈希集并与 key 关联。如果字段不存在，则字段的值在该操作执行前被设置为 0
+HINCRBY 支持的值的范围限定在 64位 有符号整数
+127.0.0.1:6379> HINCRBY zc fild5 5
+(integer) 5
+127.0.0.1:6379> HGET zc fild5
+"5"
+127.0.0.1:6379> HINCRBY zc fild5 5
+(integer) 10
+127.0.0.1:6379> HINCRBY zc fild5 3
+(integer) 13
+127.0.0.1:6379> HINCRBY zc fild5 -3
+(integer) 10
+127.0.0.1:6379>
+
+7.HINCRBYFLOAT key field increment
+为指定key的hash的field字段值执行float类型的increment加。如果field不存在，则在执行该操作前设置为0.如果出现下列情况之一，则返回错误：
+field的值包含的类型错误(不是字符串)。
+当前field或者increment不能解析为一个float类型。
+127.0.0.1:6379> HINCRBYFLOAT zc fild5 0.1
+"10.1"
+127.0.0.1:6379> HINCRBYFLOAT zc fild5 -0.2
+"9.9"
+127.0.0.1:6379>
+
+8.HKEYS key
+返回 key 指定的哈希集中所有字段的名字。
+127.0.0.1:6379> HKEYS zc
+1) "fild1"
+2) "fild2"
+3) "fild5"
+127.0.0.1:6379>
+
+9.HMGET key field [field ...]
+返回 key 指定的哈希集中指定字段的值。
+对于哈希集中不存在的每个字段，返回 nil 值。因为不存在的keys被认为是一个空的哈希集，对一个不存在的 key 执行 HMGET 将返回一个只含有 nil 值的列表
+127.0.0.1:6379> HMGET zc fild1 fild2 fild3 fild4
+1) "val1"
+2) "val2"
+3) (nil)
+4) (nil)
+127.0.0.1:6379> HMGET zc2 fild1 fild2
+1) (nil)
+2) (nil)
+
+10.HLEN key
+返回 key 指定的哈希集包含的字段的数量。
+127.0.0.1:6379> HLEN zc
+(integer) 3
+
+11.HMSET key field value [field value ...]
+设置 key 指定的哈希集中指定字段的值。该命令将重写所有在哈希集中存在的字段。如果 key 指定的哈希集不存在，会创建一个新的哈希集并与 key 关联
+127.0.0.1:6379> HMSET zc fild1 "zc1" fild2 zc2 fild3 zc3
+OK
+127.0.0.1:6379> HGETALL zc
+1) "fild1"
+2) "zc1"
+3) "fild2"
+4) "zc2"
+5) "fild5"
+6) "9.9"
+7) "fild3"
+8) "zc3"
+127.0.0.1:6379>
+
+12.HSETNX key field value
+只在 key 指定的哈希集中不存在指定的字段时，设置字段的值。如果 key 指定的哈希集不存在，会创建一个新的哈希集并与 key 关联。如果字段已存在，该操作无效果。
+1：如果字段是个新的字段，并成功赋值
+0：如果哈希集中已存在该字段，没有操作被执行
+127.0.0.1:6379> HSETNX zc fild1 "val1"
+(integer) 0
+127.0.0.1:6379> HSETNX zc fild4 "val4"
+(integer) 1
+127.0.0.1:6379>
+
+13.HSTRLEN key field
+返回hash指定field的value的字符串长度，如果hash或者field不存在，返回0.
+127.0.0.1:6379> HSTRLEN zc fild5
+(integer) 3
+127.0.0.1:6379> HGET zc fild5
+"9.9"
+
+14.HVALS key
+返回 key 指定的哈希集中所有字段的值。
+127.0.0.1:6379> HVALS zc
+1) "zc1"
+2) "zc2"
+3) "9.9"
+4) "zc3"
+5) "val4"
+127.0.0.1:6379>
+
+15.HSCAN key cursor [MATCH pattern] [COUNT count]
+
